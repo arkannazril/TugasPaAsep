@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Form Pendaftaran Singkat</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --radius:10px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{
+      margin:0;
+      background:var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:24px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:0 6px 22px rgba(16,24,40,0.06);
+      max-width:760px;
+      width:100%;
+      padding:24px;
+    }
+    h1{margin:0 0 8px 0; font-size:20px;}
+    p.lead{margin:0 0 18px 0; color:var(--muted); font-size:14px;}
+    form{display:grid; gap:12px;}
+    label{display:block; font-size:13px; margin-bottom:6px;}
+    input[type="text"], input[type="search"], select, textarea {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid #e6e9ef;
+      border-radius:8px;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    .radio-group{display:flex; gap:12px; align-items:center;}
+    .small{font-size:13px; color:var(--muted);}
+    button{
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button:active{transform:translateY(1px)}
+    .result{
+      margin-top:16px;
+      padding:12px;
+      border-radius:8px;
+      background:#fbfdff;
+      border:1px solid #e6f0ff;
+      font-size:14px;
+    }
+    @media (max-width:560px){
+      .row{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Form Pendaftaran</h1>
+    <p class="lead">Isi data di bawah ini. Contoh sederhana untuk latihan HTML + JS.</p>
+
+    <form id="regForm" autocomplete="on" novalidate>
+      <div>
+        <label for="nama">Nama lengkap <span class="small" aria-hidden="true">(*)</span></label>
+        <input id="nama" name="nama" type="text" placeholder="Contoh: Siti Aminah" required />
+      </div>
+
+      <div class="row" aria-hidden="false">
+        <div>
+          <label>Gender <span class="small">(*)</span></label>
+          <div class="radio-group" role="radiogroup" aria-labelledby="gender-label">
+            <label><input type="radio" name="gender" value="Perempuan" required> Perempuan</label>
+            <label><input type="radio" name="gender" value="Laki-laki" required> Laki-laki</label>
+            <label><input type="radio" name="gender" value="Lainnya" required> Lainnya</label>
+          </div>
+        </div>
+
+        <div>
+          <label for="sekolah">Sekolah / Institusi</label>
+          <input id="sekolah" name="sekolah" type="text" placeholder="Nama sekolah / universitas" />
+        </div>
+      </div>
+
+      <div>
+        <label for="cita">Cita-cita / Keinginan</label>
+        <textarea id="cita" name="cita" rows="4" placeholder="Menjadi dokter, guru, programmer, dsb."></textarea>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+        <button type="submit">Kirim</button>
+        <button type="button" id="resetBtn" style="background:#e5e7eb; color:#111; font-weight:600;">Reset</button>
+        <span class="small" style="margin-left:auto; color:var(--muted)">(*) wajib diisi</span>
+      </div>
+    </form>
+
+    <div id="output" class="result" aria-live="polite" hidden></div>
+  </main>
+
+  <script>
+    
+    const form = document.getElementById('regForm');
+    const output = document.getElementById('output');
+    const resetBtn = document.getElementById('resetBtn');
+
+  
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+
+      
+      const nama = (document.getElementById('nama').value || '').trim();
+      const genderInput = document.querySelector('input[name="gender"]:checked');
+      const gender = genderInput ? genderInput.value : '';
+      const sekolah = (document.getElementById('sekolah').value || '').trim();
+      const cita = (document.getElementById('cita').value || '').trim();
+
+      if (!nama) {
+        alert('Isi nama terlebih dahulu.');
+        document.getElementById('nama').focus();
+        return;
+      }
+      if (!gender) {
+        alert('Pilih gender.');
+        return;
+      }
+
+      
+      output.hidden = false;
+      output.innerHTML = `
+        <strong>Data yang Anda masukkan:</strong>
+        <ul>
+          <li><strong>Nama:</strong> ${escapeHtml(nama)}</li>
+          <li><strong>Gender:</strong> ${escapeHtml(gender)}</li>
+          <li><strong>Sekolah / Institusi:</strong> ${escapeHtml(sekolah || '-')}</li>
+          <li><strong>Cita-cita:</strong> ${escapeHtml(cita || '-')}</li>
+        </ul>
+        <small class="small">Ini hanya preview — data tidak dikirim.</small>
+      `;
+    });
+
+    
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      output.hidden = true;
+      output.innerHTML = '';
+    });
+
+    
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+  </script>
+</body>
+</html>
